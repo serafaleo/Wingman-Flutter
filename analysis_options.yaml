@@ -1,1 +1,15 @@
 include: package:flutter_lints/flutter.yaml
+
+analyzer:
+  errors:
+    prefer_single_quotes: warning
+
+formatter:
+  page_width: 100
+
+linter:
+  rules:
+    - prefer_const_constructors
+    - prefer_const_literals_to_create_immutables
+    - prefer_const_declarations
+    - prefer_single_quotes
