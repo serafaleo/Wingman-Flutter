@@ -15,8 +15,7 @@ final class DioClient {
             responseType: ResponseType.json,
             //sendTimeout: const Duration(seconds: 10),
             //receiveTimeout: const Duration(seconds: 10),
-            // Unauthorized, because we want our RefreshTokenInterceptor onError to be called
-            validateStatus: (status) => status != 401,
+            validateStatus: (status) => true,
           ),
         )
         ..interceptors.add(AuthInterceptor())

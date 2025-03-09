@@ -21,11 +21,8 @@ final class AuthInterceptor extends Interceptor {
   }
 
   @override
-  void onError(DioException err, ErrorInterceptorHandler handler) async {
-    if (err.response?.statusCode == 401) {
-      // NOTE(serafa.leo): Since the only way our AuthSessionManager will be empty is on the first
-      // app run or when the user logout, either case the app will go to login page, and so there
-      //is no way to receive a 401 with an empty AuthSessionManager.
+  void onResponse(Response response, ResponseInterceptorHandler handler) async {
+    if (response.statusCode == 401 && sl<AuthSessionManager>().userId.isNotNullOrEmpty()) {
       ApiResponseDto<TokenResponseDto> apiResponse = await sl<AuthApiDataSource>().refresh(
         RefreshRequestDto(
           userId: sl<AuthSessionManager>().userId!,
@@ -35,8 +32,8 @@ final class AuthInterceptor extends Interceptor {
       if (apiResponse.success) {
         TokenResponseDto newToken = apiResponse.data!;
         sl<AuthSessionManager>().saveSession(newToken);
-        err.requestOptions.headers['Authorization'] = 'Bearer ${newToken.accessToken}';
-        final cloneRequest = await sl<DioClient>().request(err.requestOptions.path);
+        response.requestOptions.headers['Authorization'] = 'Bearer ${newToken.accessToken}';
+        final cloneRequest = await sl<DioClient>().request(response.requestOptions.path);
         return handler.resolve(cloneRequest);
       } else {
         sl<AuthSessionManager>().clearSession();
@@ -48,6 +45,6 @@ final class AuthInterceptor extends Interceptor {
         );
       }
     }
-    super.onError(err, handler);
+    super.onResponse(response, handler);
   }
 }
