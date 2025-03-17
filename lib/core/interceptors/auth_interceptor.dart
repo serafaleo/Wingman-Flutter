@@ -21,8 +21,8 @@ final class AuthInterceptor extends Interceptor {
   }
 
   @override
-  void onResponse(Response response, ResponseInterceptorHandler handler) async {
-    if (response.statusCode == 401 && sl<AuthSessionManager>().userId.isNotNullOrEmpty()) {
+  void onError(DioException err, ErrorInterceptorHandler handler) async {
+    if (err.response!.statusCode == 401 && sl<AuthSessionManager>().userId.isNotNullOrEmpty()) {
       ApiResponseDto<TokenResponseDto> apiResponse = await sl<AuthApiDataSource>().refresh(
         RefreshRequestDto(
           userId: sl<AuthSessionManager>().userId!,
@@ -32,8 +32,8 @@ final class AuthInterceptor extends Interceptor {
       if (apiResponse.success) {
         TokenResponseDto newToken = apiResponse.data!;
         sl<AuthSessionManager>().saveSession(newToken);
-        response.requestOptions.headers['Authorization'] = 'Bearer ${newToken.accessToken}';
-        final cloneRequest = await sl<DioClient>().request(response.requestOptions.path);
+        err.response!.requestOptions.headers['Authorization'] = 'Bearer ${newToken.accessToken}';
+        final cloneRequest = await sl<DioClient>().request(err.response!.requestOptions.path);
         return handler.resolve(cloneRequest);
       } else {
         sl<AuthSessionManager>().clearSession();
@@ -45,6 +45,6 @@ final class AuthInterceptor extends Interceptor {
         );
       }
     }
-    super.onResponse(response, handler);
+    super.onError(err, handler);
   }
 }
