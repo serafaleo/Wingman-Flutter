@@ -1,6 +1,5 @@
 import 'package:dio/dio.dart';
 import 'package:wingman/core/constants/router_constants.dart';
-import 'package:wingman/core/models/api_response_dto.dart';
 import 'package:wingman/core/service_locator.dart';
 import 'package:wingman/core/services/auth_session_manager.dart';
 import 'package:wingman/core/services/dio_client.dart';
@@ -23,25 +22,22 @@ final class AuthInterceptor extends Interceptor {
   @override
   void onError(DioException err, ErrorInterceptorHandler handler) async {
     if (err.response!.statusCode == 401 && sl<AuthSessionManager>().userId.isNotNullOrEmpty()) {
-      ApiResponseDto<TokenResponseDto> apiResponse = await sl<AuthApiDataSource>().refresh(
-        RefreshRequestDto(
-          userId: sl<AuthSessionManager>().userId!,
-          refreshToken: sl<AuthSessionManager>().refreshToken!,
-        ),
-      );
-      if (apiResponse.success) {
-        TokenResponseDto newToken = apiResponse.data!;
+      try {
+        TokenResponseDto newToken = await sl<AuthApiDataSource>().refresh(
+          RefreshRequestDto(
+            userId: sl<AuthSessionManager>().userId!,
+            refreshToken: sl<AuthSessionManager>().refreshToken!,
+          ),
+        );
         sl<AuthSessionManager>().saveSession(newToken);
         err.response!.requestOptions.headers['Authorization'] = 'Bearer ${newToken.accessToken}';
         final cloneRequest = await sl<DioClient>().request(err.response!.requestOptions.path);
         return handler.resolve(cloneRequest);
-      } else {
+      } catch (e) {
         sl<AuthSessionManager>().clearSession();
-        sl<RouterManager>().go(
-          Uri(
-            path: '/login',
-            queryParameters: {RouterConstants.loginPageShowSessionExpiredWarning: true},
-          ).toString(),
+        sl<RouterManager>().goNamed(
+          '/login',
+          pathParameters: {RouterConstants.loginPageShowSessionExpiredWarning: true.toString()},
         );
       }
     }

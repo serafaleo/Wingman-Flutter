@@ -5,6 +5,7 @@ import 'package:dio/io.dart';
 import 'package:flutter/foundation.dart';
 import 'package:wingman/core/constants/api_constants.dart';
 import 'package:wingman/core/interceptors/auth_interceptor.dart';
+import 'package:wingman/core/interceptors/problem_details_interceptor.dart';
 
 final class DioClient {
   late final Dio _dio =
@@ -17,7 +18,7 @@ final class DioClient {
             receiveTimeout: kDebugMode ? null : const Duration(seconds: 10),
           ),
         )
-        ..interceptors.add(AuthInterceptor())
+        ..interceptors.addAll([AuthInterceptor(), ProblemDetailsInterceptor()])
         ..httpClientAdapter = IOHttpClientAdapter(
           createHttpClient: () {
             final HttpClient client = HttpClient(context: SecurityContext(withTrustedRoots: false));

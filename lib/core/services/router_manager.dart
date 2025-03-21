@@ -35,7 +35,7 @@ final class RouterManager {
     );
   }
 
-  void go(String location) {
-    _router.go(location);
+  void goNamed(String location, {Map<String, String> pathParameters = const <String, String>{}}) {
+    _router.goNamed(location, pathParameters: pathParameters);
   }
 }
