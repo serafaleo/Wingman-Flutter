@@ -36,7 +36,7 @@ final class AuthInterceptor extends Interceptor {
       } catch (e) {
         sl<AuthSessionManager>().clearSession();
         sl<RouterManager>().goNamed(
-          '/login',
+          RouterConstants.login,
           pathParameters: {RouterConstants.loginPageShowSessionExpiredWarning: true.toString()},
         );
       }

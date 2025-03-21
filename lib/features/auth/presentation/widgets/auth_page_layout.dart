@@ -2,6 +2,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:wingman/core/constants/router_constants.dart';
 import 'package:wingman/core/widgets/loader_indicator.dart';
 import 'package:wingman/features/auth/domain/entities/login_request_entity.dart';
 import 'package:wingman/features/auth/domain/entities/signup_request_entity.dart';
@@ -226,9 +227,9 @@ class _AuthPageLayoutState extends State<AuthPageLayout> {
                             TapGestureRecognizer()
                               ..onTap = () {
                                 if (widget.isLogin) {
-                                  context.go('/signup');
+                                  context.go(RouterConstants.signUp);
                                 } else {
-                                  context.go('/login');
+                                  context.go(RouterConstants.login);
                                 }
                               },
                       ),

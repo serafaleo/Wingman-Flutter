@@ -15,14 +15,14 @@ final class RouterManager {
   void initRouter() {
     String? initialLocation;
     if (sl<AuthSessionManager>().accessToken.isNullOrEmpty()) {
-      initialLocation = '/login';
+      initialLocation = RouterConstants.login;
     }
     _router = GoRouter(
       initialLocation: initialLocation,
       routes: [
-        GoRoute(path: '/', builder: (context, state) => const HomePage()),
+        GoRoute(path: RouterConstants.home, builder: (context, state) => const HomePage()),
         GoRoute(
-          path: '/login',
+          path: RouterConstants.login,
           builder: (context, state) {
             final bool showSessionExpiredWarning = bool.parse(
               state.pathParameters[RouterConstants.loginPageShowSessionExpiredWarning] ?? 'false',
@@ -30,7 +30,7 @@ final class RouterManager {
             return LoginPage(showSessionExpiredWarning: showSessionExpiredWarning);
           },
         ),
-        GoRoute(path: '/signup', builder: (context, state) => const SignUpPage()),
+        GoRoute(path: RouterConstants.signUp, builder: (context, state) => const SignUpPage()),
       ],
     );
   }
