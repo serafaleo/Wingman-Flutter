@@ -24,27 +24,17 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
 
   FutureOr<void> _onAuthSignUp(AuthSignUpEvent event, Emitter<AuthState> emit) async {
     emit(AuthLoadingState());
-    final result = await sl<SignUpUseCase>().call(
-      SignupRequestEntity(
-        email: event.email,
-        password: event.password,
-        passwordConfirmation: event.passwordConfirmation,
-      ),
-    );
+    final result = await sl<SignUpUseCase>().call(event.signUpEntity);
     result.fold(
       (failure) => emit(AuthFailureState(failure: failure)),
-      (unit) => emit(
-        LoginSuccessState(),
-      ), // NOTE(serafa.leo): If sign up succeeds, we login right away in the usecase;
+      (unit) => emit(SignUpSuccessState()),
     );
     return null;
   }
 
   FutureOr<void> _onAuthLogin(AuthLoginEvent event, Emitter<AuthState> emit) async {
     emit(AuthLoadingState());
-    final result = await sl<LoginUseCase>().call(
-      LoginRequestEntity(email: event.email, password: event.password),
-    );
+    final result = await sl<LoginUseCase>().call(event.loginEntity);
     result.fold(
       (failure) => emit(AuthFailureState(failure: failure)),
       (unit) => emit(LoginSuccessState()),

@@ -1,11 +1,13 @@
 import 'package:wingman/core/utils/extension_methods/string_extensions.dart';
 
 class SignupRequestEntity {
+  final String name;
   final String email;
   final String password;
   final String passwordConfirmation;
 
   SignupRequestEntity({
+    required this.name,
     required this.email,
     required this.password,
     required this.passwordConfirmation,
@@ -13,6 +15,16 @@ class SignupRequestEntity {
 }
 
 final class SignUpRequestEntityValidator {
+  static String? validateName(String? name) {
+    if (name.isNullOrEmpty()) {
+      return 'Name is required';
+    }
+    if (name!.length > 50) {
+      return 'Name must be up to 50 characters long.';
+    }
+    return null;
+  }
+
   static String? validateEmail(String? email) {
     if (email.isNullOrEmpty()) {
       return 'Email is required';

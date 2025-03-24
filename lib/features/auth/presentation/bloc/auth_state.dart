@@ -9,6 +9,8 @@ final class AuthInitialState extends AuthState {}
 
 final class AuthLoadingState extends AuthState {}
 
+final class SignUpSuccessState extends AuthState {}
+
 final class LoginSuccessState extends AuthState {}
 
 final class LogoutSuccessState extends AuthState {}

@@ -6,6 +6,7 @@ part 'signup_request_dto.g.dart';
 @JsonSerializable()
 final class SignUpRequestDto extends SignupRequestEntity {
   SignUpRequestDto({
+    required super.name,
     required super.email,
     required super.password,
     required super.passwordConfirmation,
@@ -16,6 +17,7 @@ final class SignUpRequestDto extends SignupRequestEntity {
 
   factory SignUpRequestDto.fromDomain(SignupRequestEntity signUpEntity) {
     return SignUpRequestDto(
+      name: signUpEntity.name,
       email: signUpEntity.email,
       password: signUpEntity.password,
       passwordConfirmation: signUpEntity.passwordConfirmation,
@@ -24,6 +26,7 @@ final class SignUpRequestDto extends SignupRequestEntity {
 
   SignupRequestEntity toDomain() {
     return SignupRequestEntity(
+      name: name,
       email: email,
       password: password,
       passwordConfirmation: passwordConfirmation,

@@ -20,10 +20,12 @@ class AuthPageLayout extends StatefulWidget {
 
 class _AuthPageLayoutState extends State<AuthPageLayout> {
   final _formKey = GlobalKey<FormState>();
+  final _nameController = TextEditingController();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _passwordConfirmController = TextEditingController();
 
+  final _nameFocusNode = FocusNode();
   final _emailFocusNode = FocusNode();
   final _passwordFocusNode = FocusNode();
   final _passwordConfirmFocusNode = FocusNode();
@@ -33,6 +35,7 @@ class _AuthPageLayoutState extends State<AuthPageLayout> {
   @override
   void initState() {
     super.initState();
+    _nameFocusNode.addListener(_focusChangeListener);
     _emailFocusNode.addListener(_focusChangeListener);
     _passwordFocusNode.addListener(_focusChangeListener);
     _passwordConfirmFocusNode.addListener(_focusChangeListener);
@@ -41,6 +44,7 @@ class _AuthPageLayoutState extends State<AuthPageLayout> {
   void _focusChangeListener() {
     setState(() {
       _isFormExpanded =
+          _nameFocusNode.hasFocus ||
           _emailFocusNode.hasFocus ||
           _passwordFocusNode.hasFocus ||
           _passwordConfirmFocusNode.hasFocus;
@@ -49,6 +53,7 @@ class _AuthPageLayoutState extends State<AuthPageLayout> {
 
   @override
   void dispose() {
+    _nameFocusNode.dispose();
     _emailFocusNode.dispose();
     _passwordFocusNode.dispose();
     _passwordConfirmFocusNode.dispose();
@@ -56,7 +61,6 @@ class _AuthPageLayoutState extends State<AuthPageLayout> {
   }
 
   void _dismissKeyboard() {
-    // Dismiss the keyboard when the user taps outside of the fields
     FocusScope.of(context).requestFocus(FocusNode());
   }
 
@@ -114,6 +118,23 @@ class _AuthPageLayoutState extends State<AuthPageLayout> {
                   key: _formKey,
                   child: Column(
                     children: [
+                      if (!widget.isLogin) ...[
+                        TextFormField(
+                          focusNode: _nameFocusNode,
+                          controller: _nameController,
+                          validator: SignUpRequestEntityValidator.validateName,
+                          keyboardType: TextInputType.name,
+                          decoration: InputDecoration(
+                            filled: true,
+                            fillColor: Theme.of(context).colorScheme.primary.withAlpha(50),
+                            hintText: 'Enter your name',
+                            prefixIcon: Icon(Icons.person, color: Colors.grey[600]),
+                            border: OutlineInputBorder(borderRadius: BorderRadius.circular(20)),
+                            contentPadding: const EdgeInsets.symmetric(vertical: 18),
+                          ),
+                        ),
+                        const SizedBox(height: 20),
+                      ],
                       AuthTextFormField(
                         focusNode: _emailFocusNode,
                         isPassword: false,
@@ -155,15 +176,12 @@ class _AuthPageLayoutState extends State<AuthPageLayout> {
                         height: 60,
                         child: BlocConsumer<AuthBloc, AuthState>(
                           listener: (context, state) {
-                            assert(
-                              state is AuthFailureState ||
-                                  state is AuthLoadingState ||
-                                  state is LoginSuccessState,
-                            );
                             if (state is AuthFailureState) {
                               state.failure.show(context);
                             } else if (state is LoginSuccessState) {
-                              context.go('/');
+                              context.go(RouterConstants.home);
+                            } else if (state is SignUpSuccessState) {
+                              _addLoginEvent();
                             }
                           },
                           builder: (context, state) {
@@ -180,19 +198,7 @@ class _AuthPageLayoutState extends State<AuthPageLayout> {
                               ),
                               onPressed: () {
                                 if (_formKey.currentState!.validate()) {
-                                  context.read<AuthBloc>().add(
-                                    widget.isLogin
-                                        ? AuthLoginEvent(
-                                          email: _emailController.text.trim(),
-                                          password: _passwordController.text.trim(),
-                                        )
-                                        : AuthSignUpEvent(
-                                          email: _emailController.text.trim(),
-                                          password: _passwordController.text.trim(),
-                                          passwordConfirmation:
-                                              _passwordConfirmController.text.trim(),
-                                        ),
-                                  );
+                                  widget.isLogin ? _addLoginEvent() : _addSignUpEvent();
                                 }
                               },
                               child:
@@ -239,6 +245,30 @@ class _AuthPageLayoutState extends State<AuthPageLayout> {
               ],
             ),
           ),
+        ),
+      ),
+    );
+  }
+
+  _addLoginEvent() {
+    context.read<AuthBloc>().add(
+      AuthLoginEvent(
+        loginEntity: LoginRequestEntity(
+          email: _emailController.text.trim(),
+          password: _passwordController.text.trim(),
+        ),
+      ),
+    );
+  }
+
+  _addSignUpEvent() {
+    context.read<AuthBloc>().add(
+      AuthSignUpEvent(
+        signUpEntity: SignupRequestEntity(
+          name: _nameController.text.trim(),
+          email: _emailController.text.trim(),
+          password: _passwordController.text.trim(),
+          passwordConfirmation: _passwordConfirmController.text.trim(),
         ),
       ),
     );

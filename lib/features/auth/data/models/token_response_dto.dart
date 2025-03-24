@@ -5,10 +5,16 @@ part 'token_response_dto.g.dart';
 @JsonSerializable()
 final class TokenResponseDto {
   final String userId;
+  final String userName;
   final String accessToken;
   final String refreshToken;
 
-  TokenResponseDto({required this.userId, required this.accessToken, required this.refreshToken});
+  TokenResponseDto({
+    required this.userName,
+    required this.userId,
+    required this.accessToken,
+    required this.refreshToken,
+  });
 
   factory TokenResponseDto.fromJson(Map<String, dynamic> json) => _$TokenResponseDtoFromJson(json);
   Map<String, dynamic> toJson() => _$TokenResponseDtoToJson(this);

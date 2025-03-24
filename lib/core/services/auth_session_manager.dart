@@ -7,6 +7,7 @@ import 'package:wingman/core/utils/extension_methods/string_extensions.dart';
 import 'package:wingman/features/auth/data/models/token_response_dto.dart';
 
 abstract interface class AuthSessionManager {
+  String? get userName;
   String? get userId;
   String? get accessToken;
   String? get refreshToken;
@@ -18,6 +19,8 @@ abstract interface class AuthSessionManager {
 final class AuthSessionManagerImpl implements AuthSessionManager {
   TokenResponseDto? _tokenDto;
 
+  @override
+  String? get userName => _tokenDto?.userName;
   @override
   String? get userId => _tokenDto?.userId;
   @override
