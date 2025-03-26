@@ -1,8 +1,10 @@
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:wingman/core/constants/router_constants.dart';
 import 'package:wingman/core/service_locator.dart';
 import 'package:wingman/core/services/auth_session_manager.dart';
 import 'package:wingman/core/utils/extension_methods/string_extensions.dart';
+import 'package:wingman/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:wingman/features/auth/presentation/pages/login_page.dart';
 import 'package:wingman/features/auth/presentation/pages/signup_page.dart';
 import 'package:wingman/features/home/presentation/pages/home_page.dart';
@@ -27,10 +29,18 @@ final class RouterManager {
             final bool showSessionExpiredWarning = bool.parse(
               state.pathParameters[RouterConstants.loginPageShowSessionExpiredWarning] ?? 'false',
             );
-            return LoginPage(showSessionExpiredWarning: showSessionExpiredWarning);
+            return BlocProvider(
+              create: (_) => AuthBloc(),
+              child: LoginPage(showSessionExpiredWarning: showSessionExpiredWarning),
+            );
           },
         ),
-        GoRoute(path: RouterConstants.signUp, builder: (context, state) => const SignUpPage()),
+        GoRoute(
+          path: RouterConstants.signUp,
+          builder:
+              (context, state) =>
+                  BlocProvider(create: (_) => AuthBloc(), child: const SignUpPage()),
+        ),
       ],
     );
   }

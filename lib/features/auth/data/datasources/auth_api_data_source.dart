@@ -41,7 +41,7 @@ final class AuthApiDataSourceImpl implements AuthApiDataSource {
 
   @override
   Future<void> logout() async {
-    await sl<DioClient>().post(AuthApiConstants.loginUrl);
+    await sl<DioClient>().post(AuthApiConstants.logouUrl);
     return;
   }
 }
